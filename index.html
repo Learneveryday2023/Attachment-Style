@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบ: ค้นหารูปแบบความผูกพัน (Attachment Style) | เรียนรู้วันละเรื่อง</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* ปรับโทนสีเป็นชมพูสบายตา (Dusty Rose / Soft Pink) */
+            --primary: #d65a78; 
+            --primary-dark: #b54560; /* สีสำหรับตอน Hover */
+            --primary-light: #fcebf0;
+            
+            --text-main: #5d4048; /* ปรับสีตัวอักษรให้เข้ากับธีมชมพู (น้ำตาลเข้มอมม่วง) */
+            --text-sec: #8c6b74;
+            
+            --bg: #fff5f7; /* พื้นหลังสีชมพูจางๆ */
+            --white: #ffffff;
+            
+            /* สีแสดงผลลัพธ์ (Semantic Colors) */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6; 
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(214, 90, 120, 0.15), 0 8px 10px -6px rgba(214, 90, 120, 0.1);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 1px solid #fae1e6;
+        }
+
+        /* Header */
+        header {
+            padding: 30px 30px 10px 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        p.subtitle {
+            font-size: 0.9rem;
+            color: var(--text-sec);
+        }
+
+        /* Progress Bar */
+        .progress-wrapper {
+            padding: 0 30px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .progress-track {
+            background-color: var(--primary-light);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--text-sec);
+            margin-top: 5px;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 20px 30px 40px 30px;
+        }
+
+        /* Question Styles */
+        .scenario-box {
+            background-color: var(--primary-light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .scenario-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .instruction {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: var(--text-sec);
+            font-weight: 400;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: var(--white);
+            border: 2px solid #f0e6e9;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: left;
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: #fffbfc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(214, 90, 120, 0.1);
+        }
+
+        .option-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Result Styles */
+        .result-container {
+            text-align: center;
+            display: none;
+            padding: 10px 0;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .result-desc {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-sec);
+            margin-bottom: 30px;
+            background: #faf7f8;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: left;
+            border: 1px solid #f0e6e9;
+        }
+
+        .result-desc strong {
+            color: var(--primary);
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            min-width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bar-visual {
+            width: 100%;
+            background-color: #f0e6e9;
+            height: 100px;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            width: 100%;
+            background-color: var(--primary);
+            transition: height 1s ease;
+            opacity: 0.8;
+        }
+
+        .bar-label {
+            font-size: 0.75rem;
+            margin-top: 5px;
+            color: var(--text-sec);
+            text-align: center;
+        }
+
+        .btn-restart {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 4px 10px -2px rgba(214, 90, 120, 0.4);
+            margin-top: 10px;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .btn-restart:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #b09a9f;
+            text-align: center;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>ค้นหา Attachment Style</h1>
+        </header>
+
+        <div class="progress-wrapper" id="progress-box">
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-bar"></div>
+            </div>
+            <div class="progress-text" id="progress-text">1 / 10</div>
+        </div>
+
+        <div class="content">
+            <!-- Quiz Section -->
+            <div id="quiz-section">
+                <div class="scenario-box">
+                    <div class="scenario-text" id="scenario-text">กำลังโหลดคำถาม...</div>
+                </div>
+                <p class="instruction" style="color: var(--primary); font-weight: 600;">เลือกข้อที่ตรงกับ "ความรู้สึกแวบแรก" ของคุณมากที่สุด <br><span style="font-size:0.85em; color:var(--text-sec); font-weight:400;">(ไม่มีคำตอบที่ถูกหรือผิด ขอแค่ซื่อสัตย์กับใจตัวเอง)</span></p>
+                <div class="options-grid" id="options-container">
+                    <!-- Options will be injected here -->
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div id="result-section" class="result-container">
+                <span class="result-badge">ผลลัพธ์การวิเคราะห์</span>
+                <h2 class="result-title" id="result-title"></h2>
+                
+                <div class="chart-container" id="chart-display">
+                    <!-- Bars injected via JS -->
+                </div>
+
+                <div class="result-desc" id="result-desc"></div>
+                
+                <button class="btn-restart" onclick="restartQuiz()">ทำแบบทดสอบอีกครั้ง</button>
+                
+                <footer>
+                    <p>© เรียนรู้วันละเรื่อง - ให้คุณเข้าใจตัวเองมากขึ้นทุกวัน</p>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data: Questions (Refined for less bias)
+        const questions = [
+            {
+                scenario: "1. แฟนของคุณดูเงียบผิดปกติไป 2-3 วัน เมื่อคุณถามว่าเป็นอะไรไหม เขาตอบว่า 'เปล่า ยุ่งนิดหน่อย'",
+                options: [
+                    { text: "ใจหวิวๆ เริ่มวนเวียนคิดว่าเราทำอะไรผิดไปหรือเปล่า หรือเขาเริ่มเบื่อเราแล้ว", type: "A" },
+                    { text: "เข้าใจว่าเขาคงติดธุระจริงๆ เดี๋ยวรอว่างค่อยคุยกันใหม่ ไม่ได้เก็บมาคิดมาก", type: "B" },
+                    { text: "ก็ดีนะ เฉยๆ ช่วงนี้กำลังอยากมีเวลาส่วนตัวอยู่พอดี ไม่ต้องคุยกันตลอดก็ได้", type: "C" },
+                    { text: "หงุดหงิดที่เขาเงียบไป แต่ก็ไม่กล้าทักซ้ำเพราะกลัวเขารำคาญ ก็เลยเงียบใส่บ้าง", type: "D" }
+                ]
+            },
+            {
+                scenario: "2. ระหว่างทะเลาะกันรุนแรง คู่ของคุณเริ่มใช้อารมณ์ คุณมักจะตอบสนองโดยอัตโนมัติอย่างไร?",
+                options: [
+                    { text: "ยิ่งเขาเงียบ ฉันยิ่งร้อนรน ทนความค้างคาไม่ได้ ต้องพูดให้รู้เรื่องเดี๋ยวนี้", type: "A" },
+                    { text: "พยายามฟังเหตุผล แต่ถ้าเริ่มใส่อารมณ์ใส่กัน จะขอหยุดพักให้เย็นลงก่อนค่อยคุยต่อ", type: "B" },
+                    { text: "เบื่อดราม่า ไม่อยากรับรู้อะไรแล้ว ตัดบทเดินหนี หรือเงียบใส่เพื่อให้เรื่องจบๆ ไป", type: "C" },
+                    { text: "อารมณ์พุ่งพล่าน ร้องไห้หรือโวยวาย แต่ลึกๆ คือกลัวมากว่าเขาจะทิ้งเราไปจริงๆ", type: "D" }
+                ]
+            },
+            {
+                scenario: "3. หลังจากทะเลาะกันจบลง คุณรู้สึกอย่างไร?",
+                options: [
+                    { text: "ยังระแวงไม่หาย ต้องคอยถามย้ำๆ หรือสังเกตท่าทีว่าเขายังรักกันเหมือนเดิมไหม", type: "A" },
+                    { text: "รู้สึกโล่งใจที่ได้ปรับความเข้าใจกัน แม้จะยังรู้สึกขุ่นๆ บ้างแต่ก็โอเคแล้ว", type: "B" },
+                    { text: "รู้สึกรำคาญและเหนื่อยหน่าย อยากหนีไปอยู่คนเดียวเงียบๆ สักพักใหญ่ๆ", type: "C" },
+                    { text: "รู้สึกแย่กับตัวเอง คิดว่าตัวเองเป็นต้นเหตุที่ทำให้ทุกอย่างพัง", type: "D" }
+                ]
+            },
+            {
+                scenario: "4. เมื่อคู่ของคุณทำตัวโรแมนติกมาก หรือพยายามเข้ามาใกล้ชิดทางอารมณ์มากๆ",
+                options: [
+                    { text: "รู้สึกดีมาก เหมือนได้รับการเติมเต็ม นี่คือความใกล้ชิดที่รอคอยมาตลอด", type: "A" },
+                    { text: "รู้สึกอบอุ่นและปลอดภัย สบายใจที่จะแสดงความรักตอบกลับไปตามธรรมชาติ", type: "B" },
+                    { text: "รู้สึกอึดอัดแปลกๆ เหมือนถูกลุกล้ำพื้นที่ส่วนตัว อยากถอยห่างออกมานิดนึง", type: "C" },
+                    { text: "อยากใกล้ชิดนะ แต่พอเขาเข้ามาจริงๆ กลับรู้สึกระแวงและทำตัวไม่ถูก", type: "D" }
+                ]
+            },
+            {
+                scenario: "5. คุณรู้สึกอย่างไรกับการ 'พึ่งพา' คนรัก?",
+                options: [
+                    { text: "อยากเป็นคนสำคัญที่สุดของเขา และอยากให้เขาเป็นโลกทั้งใบของฉัน", type: "A" },
+                    { text: "ต่างคนต่างดูแลตัวเองได้ แต่ก็พร้อมซัพพอร์ตกันเต็มที่ในวันที่อีกฝ่ายต้องการ", type: "B" },
+                    { text: "เชื่อว่าตนเป็นที่พึ่งแห่งตนดีที่สุด การพึ่งพาคนอื่นอาจทำให้เราดูอ่อนแอ", type: "C" },
+                    { text: "ลึกๆ อยากพึ่งพาเขา แต่ไม่กล้าคาดหวังเต็มร้อย กลัวจะผิดหวังภายหลัง", type: "D" }
+                ]
+            },
+            {
+                scenario: "6. ลึกๆ แล้ว คุณกลัวอะไรมากที่สุดในความสัมพันธ์?",
+                options: [
+                    { text: "กลัวที่สุดคือการถูกทอดทิ้ง หรือการต้องอยู่คนเดียวโดยไม่มีเขา", type: "A" },
+                    { text: "ไม่ได้กลัวอะไรเป็นพิเศษ แต่ไม่ชอบการโกหกหรือการไม่ให้เกียรติกัน", type: "B" },
+                    { text: "กลัวการสูญเสียความเป็นตัวเอง หรือถูกผูกมัดจนขยับตัวไม่ได้", type: "C" },
+                    { text: "กลัวความเจ็บปวดซ้ำรอย ทั้งอยากรักแต่ก็กลัวถูกทำร้ายใจในเวลาเดียวกัน", type: "D" }
+                ]
+            },
+            {
+                scenario: "7. คุณมอง 'คุณค่าในตัวเอง' อย่างไร เมื่ออยู่ในความสัมพันธ์?",
+                options: [
+                    { text: "รู้สึกว่าคุณค่าของฉัน ขึ้นอยู่กับความสนใจและความรักที่เขามอบให้", type: "A" },
+                    { text: "ฉันรู้ว่าฉันมีข้อดีและคู่ควรกับความรักที่ดี แม้จะไม่ได้สมบูรณ์แบบก็ตาม", type: "B" },
+                    { text: "ฉันภูมิใจที่ดูแลตัวเองได้ดี และไม่จำเป็นต้องง้อใครให้มาเติมเต็ม", type: "C" },
+                    { text: "ลึกๆ รู้สึกว่าตัวเองมีตำหนิ หรือไม่ดีพอที่จะรักษาความสัมพันธ์ดีๆ ไว้ได้", type: "D" }
+                ]
+            },
+            {
+                scenario: "8. เวลาคุณมีความทุกข์ใจ คุณมักจะจัดการอย่างไร?",
+                options: [
+                    { text: "ต้องระบายให้เขาฟังทันที ถ้าติดต่อไม่ได้จะกระวนกระวายใจมาก", type: "A" },
+                    { text: "เล่าให้เขาฟังเพื่อขอกำลังใจ แต่ก็รู้ว่าสุดท้ายเราต้องจัดการอารมณ์ตัวเองด้วย", type: "B" },
+                    { text: "เก็บไว้จัดการเองเงียบๆ ไม่อยากเล่าให้ใครฟัง เพราะมันดูไม่เข้มแข็ง", type: "C" },
+                    { text: "ลังเลว่าจะเล่าดีไหม อยากได้คนปลอบแต่ก็กลัวเขาจะมองว่าเป็นภาระ", type: "D" }
+                ]
+            },
+            {
+                scenario: "9. ประวัติความสัมพันธ์ที่ผ่านมาของคุณ มักจบลงแบบไหน?",
+                options: [
+                    { text: "มักจบลงเพราะเราทุ่มเทมากไป หรือเรียกร้องจนอีกฝ่ายอึดอัด", type: "A" },
+                    { text: "จบกันด้วยความเข้าใจ หรือแยกย้ายกันไปเติบโตตามทางของตัวเอง", type: "B" },
+                    { text: "มักจบเพราะเรารู้สึกว่า 'มันไม่ใช่' หรือเราเริ่มถอยห่างเมื่อความสัมพันธ์จริงจังขึ้น", type: "C" },
+                    { text: "มักเป็นความสัมพันธ์ที่รักแรงเกลียดแรง หรือรักๆ เลิกๆ ตัดกันไม่ขาด", type: "D" }
+                ]
+            },
+            {
+                scenario: "10. ถ้าเปรียบความรักเป็น 'บ้าน' บ้านในจินตนาการของคุณเป็นแบบไหน?",
+                options: [
+                    { text: "บ้านที่เปิดประตูหากันตลอดเวลา ไม่มีห้องลับ และตัวติดกันเสมอ", type: "A" },
+                    { text: "บ้านที่มีรั้วรอบขอบชิด มีพื้นที่ส่วนกลางไว้อบอุ่น และมีมุมส่วนตัวไว้พักใจ", type: "B" },
+                    { text: "ป้อมปราการส่วนตัว ที่ฉันกำหนดได้เองว่าใครจะเข้าหรือออกเมื่อไหร่", type: "C" },
+                    { text: "บ้านที่อยากให้อบอุ่น แต่บางครั้งก็รู้สึกเหมือนยืนอยู่บนพื้นที่ไม่มั่นคง", type: "D" }
+                ]
+            }
+        ];
+
+        // Result Data
+        const results = {
+            A: {
+                title: "Anxious Preoccupied",
+                thTitle: "แบบกังวล/โหยหา",
+                color: "#f59e0b", // Warning Color
+                desc: `
+                    <p><strong>"ฉันไม่ดีพอ แต่คนอื่นดีเลิศ"</strong></p>
+                    <p>คุณต้องการความใกล้ชิดและการยืนยันความรักอย่างสม่ำเสมอจึงจะรู้สึกปลอดภัย คุณมักมีความไวต่อสัญญาณที่บอกว่าคนรักกำลังถอยห่าง และอาจตอบสนองด้วยการเรียกร้องหรืองอนเพื่อดึงความสนใจกลับมา</p>
+                    <br>
+                    <p><strong>คำแนะนำสำหรับคุณ:</strong> ฝึกสร้างความสุขและความมั่นใจจากภายในโดยไม่ต้องรอการเติมเต็มจากคนอื่น ลองสังเกตอารมณ์ตัวเองก่อนที่จะตอบโต้ทันที และเรียนรู้ที่จะเชื่อใจในความสัมพันธ์ให้มากขึ้นครับ</p>
+                `
+            },
+            B: {
+                title: "Secure Attachment",
+                thTitle: "แบบมั่นคง",
+                color: "#10b981", // Success Color
+                desc: `
+                    <p><strong>"ฉันก็โอเค เธอก็โอเค"</strong></p>
+                    <p>ยินดีด้วยครับ! คุณมีความมั่นคงทางอารมณ์สูง คุณสบายใจที่จะใกล้ชิดและพึ่งพาคนรัก ในขณะเดียวกันก็เคารพพื้นที่ส่วนตัวของกันและกันได้ คุณจัดการความขัดแย้งด้วยเหตุผลมากกว่าอารมณ์</p>
+                    <br>
+                    <p><strong>คำแนะนำสำหรับคุณ:</strong> รักษาความสมดุลนี้ไว้ คุณคือ Safe Zone ที่ดีสำหรับคนรอบข้าง ลองสังเกตว่าคนรักของคุณเป็นแบบไหนและช่วยประคับประคองให้เขาเติบโตไปด้วยกันครับ</p>
+                `
+            },
+            C: {
+                title: "Dismissive Avoidant",
+                thTitle: "แบบหลีกเลี่ยง",
+                color: "#3b82f6", // Info Color (Blue)
+                desc: `
+                    <p><strong>"ฉันดีเลิศ แต่คนอื่นพึ่งพาไม่ได้"</strong></p>
+                    <p>คุณหวงแหนอิสระและความเป็นส่วนตัวเป็นที่สุด คุณมักรู้สึกอึดอัดเมื่อใครพยายามเข้ามาใกล้ชิดทางอารมณ์มากเกินไป ลึกๆ คุณอาจมองว่าการพึ่งพาคนอื่นคือความอ่อนแอ จึงมักจัดการปัญหาด้วยตัวเองและสร้างกำแพงขึ้นมา</p>
+                    <br>
+                    <p><strong>คำแนะนำสำหรับคุณ:</strong> ลองอนุญาตให้ตัวเองได้ "อ่อนแอ" บ้างกับคนที่ไว้ใจ การเปิดใจไม่ได้แปลว่าจะเสียอิสระ แต่มันคือการสร้างความผูกพันที่ลึกซึ้งยิ่งขึ้นครับ</p>
+                `
+            },
+            D: {
+                title: "Fearful Avoidant",
+                thTitle: "แบบสับสน/กลัว",
+                color: "#ef4444", // Danger Color
+                desc: `
+                    <p><strong>"ฉันไม่ดีพอ และคนอื่นก็น่ากลัว"</strong></p>
+                    <p>คุณมีความสับสนในใจลึกๆ ด้านหนึ่งคุณโหยหาความรักมาก แต่อีกด้านคุณก็กลัวว่าจะถูกทำร้ายหากเปิดใจ ทำให้พฤติกรรมของคุณอาจดูสับสน เดี๋ยวดีเดี๋ยวร้าย หรือดึงเข้ามาแล้วก็ผลักออกไป</p>
+                    <br>
+                    <p><strong>คำแนะนำสำหรับคุณ:</strong> ใจดีกับตัวเองให้มาก การตระหนักรู้ถึงความกลัวเป็นก้าวแรกที่ดีที่สุด ค่อยๆ ก้าวออกจาก Comfort Zone ทีละนิด และลองสื่อสารความกลัวนั้นออกมาตรงๆ แทนการผลักไสครับ</p>
+                `
+            }
+        };
+
+        // State
+        let currentIdx = 0;
+        let scores = { A: 0, B: 0, C: 0, D: 0 };
+
+        // Elements
+        const scenarioEl = document.getElementById('scenario-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressFill = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const quizSection = document.getElementById('quiz-section');
+        const resultSection = document.getElementById('result-section');
+        const progressBox = document.getElementById('progress-box');
+
+        // Functions
+        function initQuiz() {
+            currentIdx = 0;
+            scores = { A: 0, B: 0, C: 0, D: 0 };
+            quizSection.style.display = 'block';
+            resultSection.style.display = 'none';
+            progressBox.style.display = 'block';
+            loadQuestion();
+        }
+
+        // Helper: Shuffle Array (Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadQuestion() {
+            const q = questions[currentIdx];
+            
+            // Animation for transition
+            quizSection.classList.remove('fade-in');
+            void quizSection.offsetWidth; // trigger reflow
+            quizSection.classList.add('fade-in');
+
+            scenarioEl.textContent = q.scenario;
+            optionsContainer.innerHTML = '';
+
+            // Clone options to avoid modifying original order permanently, then shuffle
+            const currentOptions = shuffleArray([...q.options]);
+
+            currentOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = opt.text;
+                btn.onclick = () => handleAnswer(opt.type);
+                optionsContainer.appendChild(btn);
+            });
+
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const pct = ((currentIdx + 1) / questions.length) * 100;
+            progressFill.style.width = `${pct}%`;
+            progressText.textContent = `${currentIdx + 1} / ${questions.length}`;
+        }
+
+        function handleAnswer(type) {
+            scores[type]++;
+            currentIdx++;
+
+            if (currentIdx < questions.length) {
+                // Small delay for better UX
+                setTimeout(loadQuestion, 200);
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            quizSection.style.display = 'none';
+            progressBox.style.display = 'none';
+            resultSection.style.display = 'block';
+
+            // Calc Result
+            const maxScore = Math.max(scores.A, scores.B, scores.C, scores.D);
+            // Priority in case of tie: Fearful (D) > Anxious (A) > Avoidant (C) > Secure (B) 
+            // (Psychologically, we want to highlight issues if scores are tied with Secure)
+            let resultType = 'B';
+            if (scores.D === maxScore) resultType = 'D';
+            else if (scores.A === maxScore) resultType = 'A';
+            else if (scores.C === maxScore) resultType = 'C';
+            else resultType = 'B';
+
+            const data = results[resultType];
+
+            // Render text
+            document.getElementById('result-title').textContent = data.thTitle;
+            document.getElementById('result-title').style.color = data.color;
+            document.getElementById('result-desc').innerHTML = data.desc;
+
+            // Render Simple Bar Chart
+            const chartEl = document.getElementById('chart-display');
+            chartEl.innerHTML = '';
+            
+            const maxVal = 10; // Max possible score is 10
+            
+            ['A', 'B', 'C', 'D'].forEach(key => {
+                const val = scores[key];
+                
+                const barContainer = document.createElement('div');
+                barContainer.className = 'chart-bar';
+                
+                let label = key;
+                if(key==='A') label = 'กังวล';
+                if(key==='B') label = 'มั่นคง';
+                if(key==='C') label = 'หลีกเลี่ยง';
+                if(key==='D') label = 'สับสน';
+
+                barContainer.innerHTML = `
+                    <div class="bar-visual">
+                        <div class="bar-fill" style="height: ${val * 10}%; background-color: ${results[key].color}"></div>
+                    </div>
+                    <div class="bar-label">${label}</div>
+                `;
+                chartEl.appendChild(barContainer);
+            });
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        // Start
+        initQuiz();
+
+    </script>
+</body>
+</html>
